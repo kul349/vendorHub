@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 900px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        h3 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h4 {
+            color: #007bff;
+            margin-top: 20px;
+            font-size: 1.2rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .order-summary {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #f1f1f1;
+        }
+
+        .btn-confirm {
+            width: 100%;
+            background-color: #28a745;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-confirm:hover {
+            background-color: #218838;
+        }
+
+        .form-control-static {
+            display: inline-block;
+            font-size: 1rem;
+            color: #555;
+            font-weight: normal;
+        }
+
+        .order-summary p {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container my-5">
+        <h1 class="text-center mb-5"><%= title %></h1>
+        <p class="text-center text-success"><%= message %></p>
+
+        <h3>Order Summary</h3>
+
+        <form action="/users/updateStock_quantity/<%= order.product_id %>" method="POST"> <!-- This route will handle final order confirmation -->
+            
+            <div class="order-summary">
+                <!-- Product Details -->
+                <h4>Product Details</h4>
+                <p><strong>Product Name:</strong> <span class="form-control-static"><%= order.product_name %></span></p>
+                <p><strong>Price:</strong> ₹<span class="form-control-static"><%= order.product_price %></span></p>
+                <p><strong>Quantity:</strong> <span class="form-control-static"><%= order.quantity %></span></p>
+                <p><strong>Total Price:</strong> ₹<span class="form-control-static"><%= (order.product_price * order.quantity).toFixed(2) %></span></p>
+
+                <!-- User Details -->
+                <h4>User Details</h4>
+                <p><strong>First Name:</strong> <span class="form-control-static"><%= order.firstname %></span></p>
+                <p><strong>Last Name:</strong> <span class="form-control-static"><%= order.lastname %></span></p>
+                <p><strong>Address:</strong> <span class="form-control-static"><%= order.address %></span></p>
+                <p><strong>City:</strong> <span class="form-control-static"><%= order.city %></span></p>
+                <p><strong>State:</strong> <span class="form-control-static"><%= order.state %></span></p>
+                <p><strong>Pincode:</strong> <span class="form-control-static"><%= order.pincode %></span></p>
+                <p><strong>Phone Number:</strong> <span class="form-control-static"><%= order.contact %></span></p>
+
+                <!-- Payment Method -->
+                <h4>Payment Method</h4>
+                <p><strong><%= order.payment_method %></strong></p>
+            </div>
+
+            <!-- Hidden Inputs to Send the Product ID and Quantity -->
+            <input type="hidden" name="productId" value="<%= order.product_id %>">
+            <input type="hidden" name="quantity" value="<%= order.quantity %>">
+            
+            <!-- Confirm Order Button -->
+            <button type="submit" class="btn-confirm">Confirm Order</button>
+
+        </form>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

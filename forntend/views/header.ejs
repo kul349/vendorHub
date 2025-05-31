@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VendorHub</title>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <style>
+    /* Custom Colors */
+    :root {
+      --blush-pink: #F4F4F4; ; /* Soft Blush Pink for the main background */
+      --forest-green: #2C6E49; /* Deep Forest Green for accents */
+      --vibrant-red: #D9534F; /* Bold Red for playful accents */
+      --sunshine-yellow: #FFB84C; /* Bright Yellow for additional highlights */
+      --light-gray: #F4F4F4; /* Soft light gray for content */
+    }
+
+    /* Navbar Styling */
+    .navbar {
+      background-color: white;  /* White header */
+      color: black;
+    }
+    .navbar-dark .navbar-nav .nav-link {
+      color: black; /* Black text for the navbar links */
+    }
+    .navbar-dark .navbar-nav .nav-link:hover {
+      color: var(--sunshine-yellow);  /* Yellow hover effect */
+    }
+    .navbar-brand {
+      color: black;  /* Black text for the logo */
+    }
+    .navbar-toggler-icon {
+      background-color: black;  /* Black hamburger icon */
+    }
+
+    /* Search Bar Styling */
+    .input-group {
+      width: 100%;
+      max-width: 500px; 
+    }
+
+    .input-group .form-control {
+      border-radius: 50px; /* Fully curved on both sides */
+      padding-left: 20px; /* Increase padding for more space */
+      font-size: 1.2rem; /* Increase font size for better visibility */
+    }
+    /* Body Background */
+    body {
+      background-color: var(--blush-pink);
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: var(--forest-green);
+    }
+
+    /* Dropdown Styling for Avatar */
+    .avatar-dropdown .dropdown-menu {
+      background-color: var(--forest-green);
+      color: white;
+      margin-top: 10px;
+      z-index: 1050;
+      right: 0;
+      left: auto;
+    }
+    .avatar-dropdown .dropdown-item {
+
+      color: white;
+    }
+    .avatar-dropdown .dropdown-item:hover {
+      background-color: var(--sunshine-yellow);
+      color: var(--forest-green);
+    }
+
+    /* Avatar Circle Style */
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #2C6E49;
+      color: white;
+      text-align: center;
+      line-height: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      position: relative;
+      display: block;
+    }
+
+ 
+
+    /* Space between navbar items */
+    .navbar-nav .nav-item {
+      margin-left: 15px;
+      margin-right: 15px;
+    }
+
+    /* Add more space on the left and right of the second navbar */
+    .navbar-light {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    /* Centering navbar items */
+    .navbar-nav {
+      flex-grow: 1;
+      justify-content: center; /* Center the navbar items */
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Main Header Navbar -->
+    <!-- Main Header Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+  <!-- Left Side: VendorHub Branding -->
+  <a class="navbar-brand" href="#">VendorHub</a>
+  
+  <!-- Center: Search Bar -->
+  <div class="d-flex ms-auto">
+  <div class="input-group">
+  <input class="form-control" type="search" placeholder="Search..." aria-label="Search">
+  </div>
+  </div>
+  
+  <!-- Right Side: Avatar and Cart -->
+  <div class="ms-3 d-flex align-items-center">
+  <!-- Avatar Dropdown -->
+  <div class="avatar-dropdown dropdown">
+  <div class="avatar" id="avatarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+  <span> <%= firstLetter %></span>
+  </div>
+  <ul class="dropdown-menu" aria-labelledby="avatarDropdown">
+  <li><a class="dropdown-item" href="/users/change-password">Change Password</a></li>
+  <li><a class="dropdown-item" href="/users/logout">Logout</a></li>
+  </ul>
+  </div>
+  
+  <!-- Cart Icon -->
+  <div class="ms-3">
+    <i class="fas fa-shopping-cart" style="font-size: 24px; cursor: pointer; color: #28a745;" id="cartIcon"></i>
+  </div>
+  <div class="ms-3">
+    <a href="/orderstotalforseee">
+      <i class="fas fa-clipboard-list" style="font-size: 24px; cursor: pointer; color: #17a2b8;"></i>
+    </a>
+    
+  </div>
+  
+  </div>
+  
+  <!-- Navbar Toggle for Mobile -->
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+  <span class="navbar-toggler-icon"></span>
+  </button>
+  </div>
+  </nav>
+  
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <ul class="navbar-nav d-flex flex-row" id="navbarDropdowns">
+        <!-- The dropdowns will be populated dynamically here -->
+      </ul>
+    </div>
+</nav>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <ul class="navbar-nav d-flex flex-row" id="navbarDropdowns">
+        <!-- The dropdowns will be populated dynamically here -->
+      </ul>
+    </div>
+</nav>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>$(document).ready(function() {
+  // Step 1: Fetch main categories from the backend
+  $.ajax({
+      url: '/users/main-category/', // Replace with your actual endpoint
+      method: 'GET',
+      success: function(response) {
+          const categories = response.data; // Assuming response.data contains the categories array
+          
+          if (Array.isArray(categories)) {
+              categories.forEach(function(category) {
+                  // Step 2: Create a dropdown menu for each category
+                  const dropdownItem = `
+                      <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle" href="#" id="category-${category.id}-Dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              ${category.name}
+                          </a>
+                          <ul class="dropdown-menu" aria-labelledby="category-${category.id}-Dropdown" id="subcategories-${category.id}">
+                              <!-- Sub-categories will be loaded here -->
+                          </ul>
+                      </li>
+                  `;
+                  $('#navbarDropdowns').append(dropdownItem);
+
+                  // Step 3: Fetch subcategories for this category
+                  fetchSubCategories(category.id, category.name);
+              });
+          } else {
+              console.error('Categories are not an array:', categories);
+          }
+      },
+      error: function(xhr, status, error) {
+          console.error("Error fetching categories:", error);
+      }
+  });
+
+  // Function to fetch subcategories based on category ID
+  function fetchSubCategories(categoryId, categoryName) {
+      $.ajax({
+          url: `/users/category-items/${categoryId}`, // Replace with your actual endpoint
+          method: 'GET',
+          success: function(response) {
+              const subcategories = response.data; // Assuming response.data contains the subcategories array
+              if (Array.isArray(subcategories)) {
+                  subcategories.forEach(function(subcategory) {
+                      // Add subcategory items to the dropdown
+                      const subcategoryItem = `
+                          <li><a class="dropdown-item" href="/users/${categoryName}/${subcategory.name}">${subcategory.name}</a></li>
+                      `;
+                      $(`#subcategories-${categoryId}`).append(subcategoryItem);
+                  });
+              } else {
+                  console.error('Subcategories are not an array:', subcategories);
+              }
+          },
+          error: function(xhr, status, error) {
+              console.error("Error fetching subcategories:", error);
+          }
+      });
+  }
+});
+document.getElementById('cartIcon').addEventListener('click', function() {
+  // Redirect to wishlist page
+  window.location.href = '/wishlist';  // Adjust the URL based on your route
+});
+
+</script>
+
+</body>
+</html>

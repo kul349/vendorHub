@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Admin Panel</title>
+  <link rel="stylesheet" href="/style.css">
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+    <!-- Sidebar (Drawer) -->
+     <div class="sidebar">
+      <div class="logo-details">
+        <i class="bx bx-shop "></i>
+        <div class="logo_name">Admin</div>
+        <i class="bx bx-menu" id="btn"></i>
+      </div>
+  
+        <ul class="nav-list">
+          <li>
+            <a href="#">
+              <i class="bx bx-grid-alt"></i>
+              <span class="links_name">Dashboard</span>
+            </a>
+            <span class="tooltip">Dashboard</span>
+          </li>
+
+          <li><a href="/admin/fetch-productlist">
+            <i class="bx bx-package"></i>
+            <span class="links_name">Products</span>
+          </a>
+          <span class="tooltip">Products</span>
+        </li>
+
+
+          
+
+          <li><a href="/admin/customer-listing">
+            <i class="bx bx-user"></i>
+            <span class="links_name">customers</span>
+          </a>
+          <span class="tooltip">customers</span>
+        </li>
+
+        
+
+          <li><a href="/admin/vendor-application">
+            <i class="bx bx-folder"></i>
+          <span class="links_name">Application</span>
+          </a>
+          <span class="tooltip">Application</span>
+        </li>
+
+          <li class="profile"><a href="/admin/logout">
+            <i class="bx bx-log-out" id="log_out"></i>
+          </a></li>
+        </ul>
+</div>
+    <!-- Main content -->
+     <section class="home-section">
+      
+      
+      <div class="content">
+          <div class="d-flex flex-column">
+            <div class="item d-flex flex-row">
+              <div class="card ">
+                <h3>Total Vendor</h3>
+                <p id="total-vendor">loading...</p>
+                <div>
+                  <canvas id="myChart"></canvas>
+                </div>
+            </div>
+            <div class="card ">
+              <h3>Total Orders</h3>
+              <p id="total-order">loading...</p>
+              <div>
+                <canvas id="mydrow"></canvas>
+              </div>          
+            </div>
+
+            <div class="card group_right">
+                <h3>New Customers</h3>
+                <div class="d-flex flex-row">
+                  <p id="total-users">loading...</p>
+
+                  <!-- Buttons to set chart type -->
+                  
+                 
+                </div>
+                
+                <!-- Canvas chart -->
+                <div class="chart-parent">
+                  <button class="btn btn-outline-success rounded chart-btn" onclick="setChartType('line', this)" >Line</button>
+                  <button class="btn btn-outline-success rounded chart-btn" onclick="setChartType('bar', this)" >Bar</button>
+                  <canvas id="signupChart"></canvas>
+                </div>
+                
+            </div>
+            </div>
+            <div class="d-flex flex-row">
+              <div class="card">
+                <h3>Orders</h3>
+                <p>150</p>
+              </div>
+              <div class="card group_right">
+                <h3>Analytics</h3>
+                <p>+ 5% Revenue</p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+         
+    </section>
+
+  <script>
+
+
+   let myChart;
+   let vendorDate=[];
+   let vendorCount=[];
+
+   let mydrow;
+   let order_date=[];
+   let order_count=[];
+
+
+    let signupChart;
+    let dates = [];
+    let counts = [];
+
+    
+    function fetchUser() {
+      $.ajax({
+          url: '/admin/fetch-user',
+          method: 'GET',
+          success: function(response) {
+              const data = response.data;
+              let totalUsers = 0;
+              let signupDates = [];
+              let userCount = [];
+
+              if (Array.isArray(data)) {
+                  data.forEach(function(user) {
+                      if (user.signup_date !== 'Totals') {
+                          signupDates.push(user.signup_date);
+                          userCount.push(user.user_count);
+                      } else {
+                          totalUsers = user.user_count;
+                      }
+                  });
+
+                  $('#total-users').text(totalUsers);
+                  dates = signupDates; // Store the fetched dates globally
+                  counts = userCount; // Store the fetched counts globally
+
+                  // Initial chart type is 'line'
+                  createLineChart(dates, counts, 'line');
+              } else {
+                  console.error('Expected an array, but got:', data);
+              }
+          },
+          error: function(xhr, status, error) {
+              console.error("Error fetching user data:", error);
+              alert("Error fetching data. Please try again.");
+          }
+      });
+    }
+
+    function createLineChart(dates, counts, type) {
+      var ctx = document.getElementById('signupChart').getContext('2d');
+      
+      if (signupChart) {
+        signupChart.destroy(); // Destroy previous chart instance if exists
+      }
+
+      signupChart = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'User Signups',
+            data: counts,
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: 'rgb(75, 192, 192)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 1000,
+            easing: 'easeOutQuart'
+          },
+          scales: {
+            x: {
+              ticks: {
+                autoSkip: true,
+                maxRotation: 45,
+                minRotation: 45,
+                display: false
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Number of Signups'
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    function setChartType(type,button) {
+      const buttons = document.querySelectorAll('.chart-btn');
+      buttons.forEach(button => button.classList.remove('active'));
+
+      // Add the active class to the clicked button
+      button.classList.add('active');
+      createLineChart(dates, counts, type); // Re-render chart with new type
+    }
+
+    $(document).ready(function() {
+        fetchUser(); // Fetch user data and generate chart
+    });
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+  // Sidebar toggle functionality here
+  let sidebar = document.querySelector(".sidebar");
+  let closeBtn = document.querySelector("#btn");
+
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    menuBtnChange();
+  });
+
+  function menuBtnChange() {
+    if (sidebar.classList.contains("open")) {
+      closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+    } else {
+      closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+    }
+  }
+});
+
+
+function fetchVendor(){
+  $.ajax({
+    url:'/admin/total-vendor',
+    method:'GET',
+    success:function(response){
+      const data=response.data;
+      let totalVendor = 0;
+      let signupDates = [];
+      let vendorCount = [];    
+       
+      if (Array.isArray(data)) {
+                  data.forEach(function(vendor) {
+                      if (vendor.signup_date !== 'Total') {
+                          signupDates.push(vendor.signup_date);
+                          vendorCount.push(vendor.vendor_count);
+                      } else {
+                          totalVendor = vendor.vendor_count;
+                      }
+                  })
+                  $('#total-vendor').text(totalVendor);
+                  vendorDate= signupDates; // Store the fetched dates globally
+                  vendorCount = vendorCount; // Store the fetched counts globally
+                  createDoughnutChart(vendorDate,vendorCount)
+                }else{
+                  console.error('Expected an array, but got:', data);
+
+                }
+  },
+          error: function(xhr, status, error) {
+              console.error("Error fetching user data:", error);
+              alert("Error fetching data. Please try again.");
+          }
+})
+}
+
+function createDoughnutChart(vendorDate,vendorCount){
+  let ctx = document.getElementById('myChart');
+  
+ myChart=new Chart(ctx,{
+  type:'doughnut',
+  data:{
+    labels:vendorDate,
+    datasets:[{
+            label: 'Total Vendors',
+            data: vendorCount,
+           borderWidth: 2,
+                
+          }]
+  },
+  options:{
+    scales:{
+      y:{
+          beginAtZero:true
+      }
+    },
+    responsive:true,
+    maintainAspectRatio:false,
+  }
+ })
+}
+fetchVendor()
+
+
+
+
+function getTotalOrder(){
+  $.ajax({
+    url:'/admin/total-orders',
+    method:'GET',
+    success:function(response){
+      const data=response.data;
+      let totalOrder = 0;
+      let order_date = [];
+      let order_count = [];    
+       
+      if (Array.isArray(data)) {
+                  data.forEach(function(order) {
+                    if (order.order_date.toLowerCase() !== 'totals') {
+                      data.forEach(function(order) {
+                        if (order.order_date !== 'Totals') {
+                            order_date.push(order.order_date);
+                            order_count.push(order.order_count);
+                        } else {
+                            totalOrder = order.order_count;
+                        }
+                    })
+                    
+                    }
+                  })
+                  $('#total-order').text(totalOrder);
+                  order_date= order_date; // Store the fetched dates globally
+                  order_count = order_count; // Store the fetched counts globally
+                  createdonoutefororder(order_date,order_count)
+                }else{
+                  console.error('Expected an array, but got:', data);
+
+                }
+  },
+          error: function(xhr, status, error) {
+              console.error("Error fetching user data:", error);
+              alert("Error fetching data. Please try again.");
+          }
+})
+}
+function createdonoutefororder(orderDate, orderCount) {
+  let ctx = document.getElementById('mydrow');
+
+  mydrow = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: orderDate,
+      datasets: [{
+        label: 'Total orders',
+        data: orderCount,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      plugins: {         // Correct spelling: 'plugins' (lowercase)
+        legend: {
+          display: false // This hides the legend (colored boxes with labels)
+        }
+      },
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+}
+
+getTotalOrder();
+
+
+  </script>
+</body>
+</html>

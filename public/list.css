@@ -1,0 +1,169 @@
+
+.container {
+    margin-top: 40px;
+}
+
+.product-list {
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+
+.card-header {
+    background-color: #f1f3f6;
+    border-bottom: 1px solid #ddd;
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.table-custom {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-custom th,
+.table-custom td {
+    padding: 12px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table-custom th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.table-custom td {
+    background-color: #fff;
+}
+
+.table-custom a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.table-custom a:hover {
+    text-decoration: underline;
+}
+
+.dropdown-toggle {
+    border-radius: 5px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    background-color:green;
+}
+
+.dropdown-menu {
+    border-radius: 0 0 5px 5px;
+    min-width: 150px;
+}
+
+.dropdown-item {
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+}
+
+.search-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+.search-container input {
+    max-width: 250px;
+}
+
+.action-btn {
+    margin-left: 10px;
+    border: 1px solid #ddd;
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.action-btn:hover {
+    background-color: #0056b3;
+}
+
+.checkbox-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 10px;
+}
+
+.checkbox-container span {
+    margin-left: 10px;
+}
+
+.export-buttons {
+    margin-left: 20px;
+    
+}
+
+.selected-items-count {
+    margin-left: 10px;
+}
+/* Customize SweetAlert2 Popup */
+/* Specific selector for SweetAlert2 */
+.swal2-popup {
+width: 400px;
+height: auto;
+padding: 20px;
+font-size: 14px;
+font-family: 'Arial', sans-serif;
+}
+
+/* Increase specificity */
+body .swal2-popup {
+width: 300px;
+height: auto;
+padding: 20px;
+font-size: 14px;
+font-family: 'Arial', sans-serif;
+}
+
+
+/* Customize SweetAlert2 Title */
+.swal2-title {
+font-family: 'Verdana', sans-serif !important;
+font-size: 18px !important;
+}
+
+/* Customize SweetAlert2 Content */
+.swal2-content {
+font-family: 'Courier New', monospace !important;
+font-size: 14px !important;
+}
+
+/* Customize SweetAlert2 Actions */
+.swal2-actions {
+display: flex;
+gap: 15px !important;
+}
+
+/* Customize SweetAlert2 Buttons */
+.swal2-styled {
+font-family: 'Tahoma', sans-serif !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+.swal2-popup {
+width: 80% !important;  /* 80% width for mobile */
+padding: 15px !important;
+}
+}

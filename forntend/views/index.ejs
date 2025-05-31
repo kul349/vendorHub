@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Homepage</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Ensure carousel images are responsive and cover the available space */
+        .carousel-item {
+            display: flex; /* Create a flex container to align text and image side by side */
+            align-items: center; /* Vertically center the content */
+            height: 400px; /* Fixed height for the carousel */
+        }
+
+        /* Left side (text section) */
+        .carousel-caption {
+            flex: 1; /* This section will take up half the space */
+            position: relative;
+            color: white;
+            z-index:10; /* Ensure the text is on top of the image */
+            text-align: left; /* Align text to the left */
+        }
+
+        /* Heading (h5) styling */
+        .carousel-caption h5 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        /* Paragraph styling */
+        .carousel-caption p {
+            font-size: 1.2rem;
+            font-style: italic;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Optional text shadow for better visibility */
+        }
+
+        /* Button styling */
+        .carousel-caption .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ff6347; /* Button color (tomato) */
+            border: none;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Hover effect for the button */
+        .carousel-caption .btn:hover {
+            background-color: #e53e3e; /* Darker shade when hovered */
+        }
+
+        /* Right side (image section) */
+        .carousel-item img {
+            width: 50%;  /* Image takes up 50% of the space */
+            height: 100%; /* Image covers the entire height of the carousel */
+            object-fit: cover; /* Ensures the image covers the area properly */
+        }
+
+        /* for explore categories */
+        /* Full-width Category Section */
+        .categories-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 40px 0; /* Space above and below */
+            width: 100%;  /* Make the section full width */
+        }
+
+        .category-item {
+            text-align: center;
+            margin-bottom: 30px; /* Space between items */
+            width: 20%; /* Each item takes up 20% of the container width */
+        }
+
+        /* Circular Avatar Image */
+        .category-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%; /* Make the image circular */
+            object-fit: cover; /* Ensure the image covers the circle */
+            margin-bottom: 15px; /* Space between image and text */
+            transition: transform 0.3s ease; /* Smooth hover effect */
+        }
+
+        /* Hover effect on the image */
+        .category-img:hover {
+            transform: scale(1.1); /* Slight zoom on hover */
+        }
+
+        .category-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            text-transform: capitalize;
+        }
+
+        /* Button (Optional) */
+        .category-link {
+            text-decoration: none; /* Remove underline from link */
+            color: inherit; /* Inherit color from parent */
+        }
+
+        /* Full-width Category Section */
+        .category-section {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 50px;
+        }
+
+        .category-section .left-text {
+            flex: 1;
+            padding-left: 5%;
+            text-align: left;
+        }
+
+        .category-section .right-img {
+            flex: 1;
+            text-align: center;
+        }
+
+        .category-section .right-img img {
+            width: 80%; /* Adjust the image size */
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+     /* Example: Customize the Toast */
+.swal2-toast {
+  background-color: #28a745; 
+  color: white; 
+  font-size: 1rem; 
+  border-radius: 10px; 
+}
+
+.swal2-icon-success {
+  color: #ffffff; 
+}
+
+
+    </style>
+</head>
+<body>
+    
+    <%- include("header",{firstLetter}) %>
+    <% if(message){%>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.1/dist/sweetalert2.all.min.js"></script>
+        <script>
+            Swal.fire({
+           toast: true,              
+           position: 'bottom-end',     
+           icon: '<%= messageType%>',          
+           title: '<%= message%>',  
+           showConfirmButton: false, 
+           timer: 3000,              
+           timerProgressBar: true,   
+           didOpen: (toast) => {     
+           toast.addEventListener('mouseenter', Swal.stopTimer) 
+           toast.addEventListener('mouseleave', Swal.resumeTimer) 
+  }
+   });
+   </script>
+        <%}%>
+        <script>
+              window.history.pushState(null, null, window.location.href);  // Add current page to history
+        window.onpopstate = function () {
+            window.history.go(1);  // If the user tries to go back, it pushes them forward
+        };
+        </script>
+    <!-- Carousel -->
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <!-- First Image -->
+            <div class="carousel-item active">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Find it. Get it. Love it.</h5>
+                    <p>Step up your style with one-of-a-kind pieces.</p>
+                    <a href="#fashionSection" class="btn">Shop Now</a>
+                </div>
+                <img src="https://images.unsplash.com/photo-1485125639709-a60c3a500bf1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGZhc2hpb258ZW58MHx8MHx8fDA%3D/1200x400" class="d-block w-100" alt="Fashion Item">
+            </div>
+
+            <!-- Second Image -->
+            <div class="carousel-item">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Unveil Your Unique Style</h5>
+                    <p>Discover exclusive fashion pieces that are as unique as you. Hard-to-find items that let you stand out from the crowd.</p>
+                    <a href="#fashionSection" class="btn">Shop Now</a>
+                </div>
+                <img src="https://images.unsplash.com/photo-1526045478516-99145907023c?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D/1200x400" class="d-block w-100" alt="Fashion Item">
+            </div>
+
+            <!-- Third Image -->
+            <div class="carousel-item">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Elegance in Every Detail</h5>
+                    <p>Explore the art of fashion, where every piece tells a story and elevates your personal style.</p>
+                    <a href="#fashionSection" class="btn">Shop Now</a>
+                </div>
+                <img src="https://images.unsplash.com/photo-1470468969717-61d5d54fd036?q=80&w=1488&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D/1200x400" class="d-block w-100" alt="Fashion Item">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- Explore Popular Categories Section -->
+    <div class="container-fluid">
+        <h2 class="text-left my-4">Explore Popular Categories</h2>
+        <div class="categories-container">
+            <!-- Sneaker Category -->
+            <div class="category-item">
+                <a href="/sneakers" class="category-link">
+                    <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSjpppccX3gEbGAQs0m-zpVxoVbWNHM2EG_Kyy55czoVoV2Av0BJNE9LECbShkfdLMH4FUiyvK_f7BgonRcyckCj419-n5DNUerFgVs5yO63ut4azqB1K1Nsg" class="category-img" alt="Sneakers">
+                    <p class="category-name">Sneakers</p>
+                </a>
+            </div>
+
+            <!-- Toy Category -->
+            <div class="category-item">
+                <a href="/toys" class="category-link">
+                    <img src="https://www.giftify.in/cdn/shop/products/image9_c4b05f64-fab2-406f-9683-eb7b32dc00b7.jpg?v=1679235394" class="category-img" alt="Toys">
+                    <p class="category-name">Toys</p>
+                </a>
+            </div>
+
+            <!-- Apparel Category -->
+            <div class="category-item">
+                <a href="/apparel" class="category-link">
+                    <img src="https://www.cgsinc.com/sites/default/files/styles/blog_details/public/media/images/blog/CGSinc.com%20What%20Industry%204.0%20means%20for%20Apparel%20Fashion%20%20Footwear%20Manufacturers.jpg?itok=im69yrRM" class="category-img" alt="Apparel">
+                    <p class="category-name">Apparel</p>
+                </a>
+            </div>
+
+            <!-- Electronics Category -->
+            <div class="category-item">
+                <a href="/electronics" class="category-link">
+                    <img src="https://www.codrey.com/wp-content/uploads/2017/12/Consumer-Electronics.png" class="category-img" alt="Electronics">
+                    <p class="category-name">Electronics</p>
+                </a>
+            </div>
+
+            <!-- Accessories Category -->
+            <div class="category-item">
+                <a href="/accessories" class="category-link">
+                    <img src="https://michaelkors.scene7.com/is/image/MichaelKors/35S1SU5T7T-0001_1?$zoom$" class="category-img" alt="Accessories">
+                    <p class="category-name">Accessories</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <%- include("user/userfooter") %>
+ <script>
+    
+    const accessToken = "<%= accessToken %>"; // EJS syntax to insert the token
+    localStorage.setItem('accessToken', accessToken);
+    console.log("Access Token set in localStorage:", localStorage.getItem('accessToken'));
+    const userId = "<%= userId %>";  // Match the key you're sending in res.render
+  localStorage.setItem('userId', userId);
+  console.log('User ID from the index:', userId);
+
+
+
+ </script>
+</body>
+
+</html>

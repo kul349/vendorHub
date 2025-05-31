@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Orders</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .order-card {
+      margin-bottom: 20px;
+    }
+    .order-header {
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      font-weight: bold;
+      border-radius: 5px 5px 0 0;
+    }
+    .order-image {
+      width: 80%;
+      height: 300PX;
+      border-radius: 10px;
+    }
+    .order-details {
+      padding: 15px;
+      background-color: white;
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .order-status {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .order-price {
+      font-size: 1.3rem;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Your Orders</h2>
+
+    <div class="row" id="orders-container">
+      <!-- Orders will be injected here -->
+    </div>
+
+    <p id="no-orders" class="text-center" style="display: none;">No orders found.</p>
+  </div>
+
+  <script>
+    const userId = localStorage.getItem('userId');
+    const ordersContainer = document.getElementById('orders-container');
+    const noOrdersText = document.getElementById('no-orders');
+
+    if (userId) {
+      fetch(`/users/ordertotal-user/${userId}`)
+        .then(response => response.json())
+        .then(orders => {
+          if (orders.length > 0) {
+            orders.forEach(order => {
+              const orderHTML = `
+                <div class="col-md-4">
+                  <div class="card order-card">
+                    <div class="order-header">
+                      Order #${order.order_id} - ${new Date(order.created_at).toLocaleDateString()}
+                    </div>
+                        <img src="/uploads/${order.image}" class="order-image" alt="Product Image">
+                    <div class="order-details">
+                      <div class="order-status">Status: ${order.order_status}</div>
+                      <p><strong>Product:</strong> ${order.product_id}</p>
+                      <p><strong>Quantity:</strong> ${order.quantity}</p>
+                      <p><strong>Delivery Method:</strong> ${order.delivery}</p>
+                      <p><strong>Address:</strong> ${order.address}, ${order.city}, ${order.state}, ${order.pincode}</p>
+                      <p class="order-price"><strong>Total Price:</strong> ₹${order.total_price}</p>
+                      <a href="/order/${order.order_id}" class="btn btn-primary btn-block">View Details</a>
+                    </div>
+                  </div>
+                </div>
+              `;
+              ordersContainer.innerHTML += orderHTML;
+            });
+          } else {
+            noOrdersText.style.display = 'block';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching orders:', error);
+          noOrdersText.textContent = "Failed to load orders.";
+          noOrdersText.style.display = 'block';
+        });
+    } else {
+      noOrdersText.textContent = "User not logged in.";
+      noOrdersText.style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>

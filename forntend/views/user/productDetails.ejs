@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= product.name %> - Product Details</title>
+
+  <!-- Font Awesome & Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    .product-detail-img {
+      width: 90%;
+      height: 200px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+    .product-card {
+      border: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease-in-out;
+    }
+    .product-card:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .product-info {
+      margin-bottom: 30px;
+    }
+    .product-details-scrollable {
+      max-height: 600px;
+      overflow-y: scroll;
+    }
+
+    .btn-lg {
+      padding: 12px 30px ;
+      font-size: 1.1rem;
+    }
+    .form-control {
+      max-width: 200px;
+    }
+    .row {
+      margin-bottom: 15px;
+    }
+
+    .row h6 {
+      font-size: 18px;
+      margin-right: 1px;
+    }
+
+    .row span {
+      font-size: 24px;
+      color: #ffd700;
+    }
+
+    .progress {
+      height: 6px;
+      background-color: #e9ecef;
+      border-radius: 5px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.6s ease;
+    }
+
+    .container-progressbar {
+      width: 300px;
+    }
+
+    .review-item {
+      margin-bottom: 20px;
+    }
+    .review-text {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .btn-custom {
+      font-size: 0.9rem;                 
+      width: auto; 
+      background-color: antiquewhite;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container my-5">
+    <h1 class="text-center mb-5"><%= product.name %></h1>
+
+    <!-- Product Detail Row -->
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card product-card">
+          <div style="position: relative; padding-top: 20px;">
+            <button style="background: none; border: none; cursor: pointer; position: absolute; right: 0;" onclick="alert('You liked it!');">
+              <i class="fa-solid fa-heart" style="font-size: 24px;"></i>
+            </button>
+          </div>
+
+          <% if (product.image) { 
+            let images = product.image.split(','); %>
+            <img src="/uploads/<%= images[0].trim() %>" alt="<%= product.name %>" class="product-detail-img" />
+          <% } else { %>
+            <img src="/uploads/default-image.jpg" alt="No image available" class="product-detail-img" />
+          <% } %>
+
+          <div class="my-3">
+            <% if (product.stock_quantity > 0) { %>
+              <div class="d-flex justify-content-around">
+                <button class="btn btn-outline-success rounded-shadow btn-sm-2 p-3" onclick="addToCart('<%= product.id %>')">Add to Cart</button>
+                <form action="/users/orderPage/<%= product.id %>" method="GET">
+                  <button class="btn btn-outline-danger rounded-shadow btn-sm p-3" type="submit">Buy Now</button>
+                </form>
+              </div>
+            <% } else { %>
+              <button class="btn btn-secondary btn-lg p-3" disabled>Out of Stock</button>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8 product-details-scrollable">
+        <h3><%= product.name %></h3>
+        <p><%= product.description %></p>
+        <h4 class="text-success">₹<%= product.price %></h4>
+        <p class="text-muted">Stock: <%= product.stock_quantity %></p>
+
+        <div class="d-flex justify-content-around align-items-center mb-3">
+          <h4>Customer Reviews</h4>
+          <button class="btn btn-outline-s rounded-shadow btn-custom" data-bs-toggle="modal" data-bs-target="#rateProductModal">
+            Rate Product
+          </button>
+        </div>
+
+        <!-- Progress bars -->
+        <div class="container-progressbar">
+          <% for (let i = 1; i <= 5; i++) { %>
+            <div id="rating-<%= i %>" class="d-flex align-items-center mb-1">
+              <h6 class="mr-2"><%= i %> ★</h6>
+              <div class="progress" style="flex-grow: 1;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          <% } %>
+        </div>
+
+        <br>
+
+        <!-- Reviews Section -->
+        <div class="reviews-section" id="reviews-section">
+          <div id="reviews-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+  <!-- Rating Modal -->
+  <div class="modal fade" id="rateProductModal" tabindex="-1" aria-labelledby="rateProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="rateProductForm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="rateProductModalLabel">Rate this Product</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="rating" class="form-label">Rating (1 to 5)</label>
+              <select class="form-select" id="rating" required>
+                <option value="">Choose rating</option>
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <option value="<%= i %>"><%= i %> ★</option>
+                <% } %>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="review" class="form-label">Your Review</label>
+              <textarea class="form-control" id="review" rows="3" required></textarea>
+            </div>
+
+            <!-- Hidden fields -->
+            <input type="hidden" id="productid" value="<%= product.id %>">
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Submit Rating</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function updateRatings(ratingData) {
+      const totalReviews = ratingData.totalReviews || 1;
+
+      for (let i = 1; i <= 5; i++) {
+        const ratingCount = ratingData.ratings[i - 1] || 0;
+        const percentage = (ratingCount / totalReviews) * 100;
+
+        const progressBar = document.querySelector(`#rating-${i} .progress-bar`);
+        if (progressBar) {
+          progressBar.style.width = `${percentage}%`;
+          progressBar.setAttribute('aria-valuenow', percentage.toFixed(2));
+        }
+      }
+    }
+
+    function displayReviews(reviews) {
+      const reviewsList = document.getElementById('reviews-list');
+      reviewsList.innerHTML = '';
+
+      reviews.forEach(review => {
+        const reviewDiv = document.createElement('div');
+        reviewDiv.classList.add('review-item');
+        reviewDiv.innerHTML = `
+          <div><strong>${review.username}</strong> - Rating: ${'★'.repeat(review.rating)}</div>
+          <p class="review-text">${review.text}</p>
+        `;
+        reviewsList.appendChild(reviewDiv);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const productId = "<%= product.id %>";
+
+      fetch(`/users/product/viewRating/${productId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.ratings && data.reviews) {
+            updateRatings(data);
+            displayReviews(data.reviews);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching ratings:', error);
+        });
+
+      document.getElementById('rateProductForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const rating = document.getElementById('rating').value;
+        const review = document.getElementById('review').value;
+        const productid = document.getElementById('productid').value;
+
+        const data = {  productid, review, rating };
+
+        fetch('/users/addRating', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(response => {
+          alert(response.message || "Rating submitted!");
+          location.reload();
+        })
+        .catch(err => {
+          console.error("Error:", err);
+          alert("Error submitting rating.");
+        });
+      });
+    });
+
+      function addToCart(productId) {
+        const userId = localStorage.getItem('userId');
+    
+        if (!userId) {
+          alert('User not logged in. Please log in first.');
+          return;
+        }
+    
+        console.log('User ID for add to cart:', userId);
+    
+        fetch('/users/add-wishlist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ user_id: userId, product_id: productId })
+        })
+        .then(response => {
+          if (response.ok) {
+            alert('Product added to cart!');
+          } else {
+            response.text().then(msg => alert(msg));
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('Failed to add product to cart');
+        });
+      }
+    
+    
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-align: center;
+            color: #333;
+        }
+        .form-control, .btn {
+            border-radius: 5px;
+        }
+        .form-control:focus, .btn:focus {
+            box-shadow: none;
+        }
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .submit-btn {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container mt-5">
+        <div class="form-container">
+            <h2>Add Product</h2>
+            <!-- Form for adding a product -->
+            <form action="/vendor/productAdd" method="POST" enctype="multipart/form-data">
+                <!-- Vendor ID (Hidden, passed from session) -->
+                <input type="hidden" name="vendor_id" value="<%= vendor_id %>">
+                
+                <!-- Product Name -->
+                <div class="mb-3">
+                    <label for="name" class="form-label">Product Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter product name" required>
+                </div>
+                
+                <!-- Product Description -->
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe the product" required></textarea>
+                </div>
+                
+                <!-- Product Image -->
+                <div class="mb-3">
+                    <label for="image" class="form-label">Product Image</label>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*" required multiple>
+                </div>
+                
+                <!-- Product Price -->
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price</label>
+                    <input type="number" class="form-control" id="price" name="price" placeholder="Enter product price" step="1" min="0" required>
+                </div>
+                
+                <!-- Product Stock Quantity -->
+                <div class="mb-3">
+                    <label for="stock_quantity" class="form-label">Stock Quantity</label>
+                    <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" placeholder="Enter stock quantity" min="0" required>
+                </div>
+
+                <!-- Main Category -->
+                <div class="mb-3">
+                    <label for="main_category" class="form-label">Main Category</label>
+                    <select class="form-control" id="main_category" name="main_category" required>
+                        <option value="">Loading Categories...</option>
+                    </select>
+                </div>
+
+                <!-- Sub Category -->
+                <div class="mb-3">
+                    <label for="sub_category" class="form-label">Sub Category</label>
+                    <select class="form-control" id="sub_category" name="sub_category" required>
+                        <option value="">Select Sub Category</option>
+                    </select>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn submit-btn">Add Product</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    
+    <script>
+   document.addEventListener("DOMContentLoaded", () => {
+    const vendorId = "<%= vendor_id %>"; // Get the vendor ID dynamically
+    const mainCategorySelect = document.getElementById('main_category');
+    const subCategorySelect = document.getElementById('sub_category');
+
+    // Fetch categories based on vendor ID
+    fetch(`/vendor/main-category/${vendorId}`)
+        .then(response => response.json()) // Use .json() to parse the response
+        .then(data => {
+            const categories = data.data || []; // Assuming the categories are under 'data' field
+
+            // Clear the category dropdown and set default option
+            mainCategorySelect.innerHTML = '<option value="">Select Category</option>';
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.textContent = category.name; // Display category name to the user
+                option.setAttribute('data-id', category.id); // Store the category ID in a data attribute
+                mainCategorySelect.appendChild(option);
+            });
+
+            // Trigger change event to load subcategories when a category is selected
+            mainCategorySelect.dispatchEvent(new Event('change'));
+        })
+        .catch(error => console.error("Error fetching categories:", error));
+
+    // Fetch subcategories based on selected category
+    mainCategorySelect.addEventListener('change', (event) => {
+        const selectedCategoryOption = event.target.selectedOptions[0]; // Get the selected option
+        const selectedCategoryId = selectedCategoryOption ? selectedCategoryOption.getAttribute('data-id') : ''; // Get the category ID from the data-id attribute
+
+        // Clear current subcategory options
+        subCategorySelect.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select Sub Category';
+        subCategorySelect.appendChild(defaultOption);
+
+        // Fetch subcategories for the selected category
+        if (selectedCategoryId) {
+            fetch(`/vendor/vendor-sub_category/${selectedCategoryId}`)
+                .then(response => response.json()) // Use .json() to parse the response
+                .then(data => {
+                    const subcategories = data.data || []; // Assuming subcategories are under 'data' field
+
+                    // Populate subcategory dropdown
+                    subcategories.forEach(subcategory => {
+                        const option = document.createElement('option');
+                        option.textContent = subcategory.name; // Display subcategory name to the user
+                        option.setAttribute('data-id', subcategory.id); // Store the subcategory ID in a data attribute
+                        subCategorySelect.appendChild(option);
+                    });
+
+                    // Optional: Trigger change event on subcategory dropdown if needed
+                    subCategorySelect.dispatchEvent(new Event('change'));
+                })
+                .catch(error => console.error("Error fetching subcategories:", error));
+        }
+    });
+});
+
+
+    </script>
+</body>
+</html>
+    

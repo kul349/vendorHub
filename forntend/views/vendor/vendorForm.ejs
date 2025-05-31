@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Become a Vendor - Registration</title>
+  <!-- Bootstrap CSS (Using CDN for simplicity) -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding-top: 50px;
+      background-color: #f7f9fc;
+    }
+    .container {
+      max-width: 800px;
+    }
+    .form-section {
+      margin-bottom: 30px;
+    }
+    .card {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .card-header {
+      background-color: #5c6bc0;
+      color: white;
+      text-align: center;
+      border-radius: 10px 10px 0 0;
+    }
+    .btn-primary {
+      background-color: #5c6bc0;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #4f5b94;
+    }
+    h2 {
+      color: #5c6bc0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Welcome Heading -->
+    <h2 class="text-center mb-4">Welcome to VendorHub</h2>
+    <p class="text-center mb-4">Become a part of our growing community by applying to become a vendor.</p>
+
+    <!-- Vendor Registration Card -->
+    <div class="card">
+      <div class="card-header">
+        <h4>Become a Vendor</h4>
+      </div>
+      <div class="card-body">
+        <!-- Vendor Registration Form -->
+        <form action="/vendor/register-vendor/<%= vendorId %>" method="POST" >
+
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <h5>Personal Information</h5>
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" class="form-control" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" class="form-control" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="text" class="form-control" id="phone" name="phone" required>
+            </div>
+          </div>
+
+          <!-- Business Information Section -->
+          <div class="form-section">
+            <h5>Business Information</h5>
+            <div class="form-group">
+              <label for="businessName">Business Name</label>
+              <input type="text" class="form-control" id="businessName" name="businessName" required>
+            </div>
+            <div class="form-group">
+              <label for="businessAddress">Business Address</label>
+              <input type="text" class="form-control" id="businessAddress" name="businessAddress" required>
+            </div>
+            <div class="form-group">
+              <label for="website">Business Website/Social Links</label>
+              <input type="url" class="form-control" id="website" name="website">
+            </div>
+            <div class="form-group">
+              <label for="taxId">Tax ID / Business Registration Number</label>
+              <input type="text" class="form-control" id="taxId" name="taxId" required>
+            </div>
+          </div>
+          <input type="hidden" name="vendor_id" value="<%= vendorId %>" />          <!-- Product Information Section -->
+          <div class="form-section">
+            <h5>Product/Service Information</h5>
+            <div class="form-group">
+              <label for="productType">Product/Service Type</label>
+              <input type="text" class="form-control" id="productType" name="productType" required>
+            </div>
+
+            <!-- Product Categories Section -->
+            <div class="form-group">
+              <label for="productCategories">Select Product Categories</label>
+              <select class="form-control" id="productCategories" name="productCategories[]" multiple required>
+                <!-- Categories will be dynamically populated here via AJAX -->
+              </select>
+            </div>
+
+            <!-- Custom Category -->
+            <div class="form-group">
+              <label for="customCategory">Or Add Your Own Category</label>
+              <input type="text" class="form-control" id="customCategory" name="customCategory" placeholder="Enter a new category (Optional)">
+            </div>
+
+            <div class="form-group">
+              <label for="businessDesc">Brief Description of Business</label>
+              <textarea class="form-control" id="businessDesc" name="businessDesc" rows="4" required></textarea>
+            </div>
+          </div>
+
+         
+
+          <!-- Agreement Checkbox -->
+          <div class="form-group">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="termsConditions" name="termsConditions" required>
+              <label class="form-check-label" for="termsConditions">
+                I agree to the <a href="/terms-and-conditions" target="_blank">Terms & Conditions</a> and <a href="/privacy-policy" target="_blank">Privacy Policy</a>.
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">Submit Application</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (Using CDN) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- jQuery (needed for AJAX and dynamic dropdown) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      // Make an AJAX call to fetch the categories
+      $.ajax({
+  url: '/vendor/fetch-categories', // The backend route to fetch categories
+  type: 'GET',
+  success: function(response) {
+    console.log(response); // Log the full response to check its structure
+
+    // Check if 'data' exists and is an array
+    var categories = response.data;
+
+    if (Array.isArray(categories)) {
+      // Clear the dropdown
+      $('#productCategories').empty();
+
+      // Loop through the categories and append each one to the dropdown
+      categories.forEach(function(category) {
+        $('#productCategories').append(
+          `<option value="${category.id}">${category.name}</option>`
+        );
+      });
+    } else {
+      console.error('Categories data is not an array:', categories);
+    }
+  },
+  error: function(err) {
+    console.error('Error fetching categories:', err);
+    alert('An error occurred while fetching categories.');
+  }
+});
+
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            line-height: 40px;
+            cursor: pointer;
+            position: relative;
+            display: block;
+        }
+        .navbar-nav .nav-item{
+          margin-left: 10px;
+          margin-right: 10px;
+        }
+      
+        .navbar .navbar-brand{
+          margin-left: 10px;
+        }
+        
+    .nav-item .dropdown-menu{
+      margin-top: 10px;
+      z-index: 1050;
+      right: 0;
+      left: auto;
+    }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Vendor Dashboard</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <button class="btn btn-outline-primary" onclick="window.location.href='/vendor/viewProduct'">Product View</button>
+            </li>
+            <li class="nav-item">
+              <button class="btn btn-outline-primary ms-2" onclick="window.location.href='/addProduct'">Add Product</button>
+            </li>
+            <li class="nav-item">
+              <button class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-bell"></i>
+              </button>
+            </li>
+            <!-- Avatar Dropdown -->
+            <li class="nav-item dropdown">
+              <div class="avatar" id="avatarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <span><%= firstLetter %></span> <!-- Replace with the user's first letter -->
+              </div>
+              <ul class="dropdown-menu" aria-labelledby="avatarDropdown">
+                <li><a class="dropdown-item" href="/change-password">Change Password</a></li>
+                <li><a class="dropdown-item" href="/vendor/logout">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+    <!-- Bootstrap 5 JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

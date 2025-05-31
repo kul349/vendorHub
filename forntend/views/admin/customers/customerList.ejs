@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/list.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.19/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <span class="header-title">Customer Listing</span>
+                <div class="search-container">
+                    <input class="form-control" type="text" id="searchCustomer" placeholder="Search Customer">
+                    <div class="export-buttons">
+                        <!-- Export dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-success dropdown-toggle" type="button" id="exportDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Export
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="exportDropdown">
+                                <a  class="dropdown-item" href="#" id="exportPdf" onclick="exportToPDF()">Export PDF</a>
+                                <a class="dropdown-item" href="#" id="exportCsv">Export CSV</a>
+                                <a class="dropdown-item" href="#" id="exportXls">Export XLS</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Checkbox and delete buttons container -->
+                <div class="checkbox-container">
+                    <span class="selected-items-count" id="selectedCount">0 items selected</span>
+                    <button id="deleteSelected" class="btn btn-danger ml-3" style="display:none;">Delete Selected</button>
+                </div>
+
+                <!-- Table displaying customer details -->
+                <table class="table table-bordered table-custom">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th>User ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTableBody">
+                        <!-- Customer data rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional: Add Bootstrap JS for interactivity -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.1/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Select all checkboxes functionality
+            $('#selectAll').on('change', function() {
+                const isChecked = $(this).prop('checked');
+                $('.customer-checkbox').prop('checked', isChecked);
+                updateSelectedItemsCount();
+            });
+
+            // Listen for changes in individual checkboxes
+            $(document).on('change', '.customer-checkbox', function() {
+                updateSelectedItemsCount();
+            });
+
+           // Delete selected customers
+$('#deleteSelected').on('click', function() {
+    const selectedIds = getSelectedCustomerIds();
+    if (selectedIds.length > 0) {
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-danger outlined rounded',
+                cancelButton: 'btn btn-success outlined rounded'
+            },
+            buttonsStyling: false,
+            width: '400px',
+            padding: '20px',
+            heightAuto: true
+        });
+
+        swalWithBootstrapButtons.fire({
+            title: 'Are you sure?',
+            text: 'You want to delete the selected customers?',
+            icon: 'warning',
+            confirmButtonText: 'Yes, delete',
+            showCancelButton: true, // Corrected spelling here
+            cancelButtonText: 'No, cancel', // This will show the "No, cancel" button
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                swalWithBootstrapButtons.fire({
+                    title: 'Deleted!',
+                    text: 'You have deleted all the selected customers.',
+                    icon: 'success',
+                    confirmButtonText: 'Okay, got it'
+                });
+            } else if (result.dismiss === Swal.DismissReason.cancel) { // Corrected the comparison
+                swalWithBootstrapButtons.fire({
+                    title: 'Cancelled!',
+                    text: 'The selected customers were not deleted.',
+                    icon: 'error',
+                    confirmButtonText: 'Okay, got it'
+                });
+            }
+        });
+    }
+});
+
+            let debounceTimer;  // Declare debounceTimer to store the timeout ID
+
+$('#searchCustomer').on('input', function() {
+    const searchQuery = $(this).val();
+
+    // Clear the previous timeout to prevent multiple rapid function calls
+    clearTimeout(debounceTimer);
+
+    // Set a new timeout to delay the fetchCustomer call by 500ms
+    debounceTimer = setTimeout(function() {
+        fetchCustomer(searchQuery);  // Call the fetchCustomer function with the query
+    }, 500);  // Delay is set to 500 milliseconds (can be adjusted)
+});
+
+            // Initial fetch of customer data
+            fetchCustomer();
+        });
+
+        function fetchCustomer(query = '') {
+            $.ajax({
+                url: '/admin/search-users',  // URL to search for customer data
+                method: 'GET',
+                data: { query: query },  // Send search query in request
+                success: function(response) {
+                    const customers = response.data; // Assuming response contains customer data
+                    if (!customers || customers.length === 0) {
+                // If no customers are found, display a "No results found" message
+                $('#customerTableBody').html('<tr><td colspan="6" class="text-center">No customers found</td></tr>');
+                return;
+            }
+                    if (!customers) {
+                        console.error('Data is missing in the response');
+                        return;
+                    }
+
+                    let rows = '';
+                    customers.forEach(function(customer) {
+                        rows += `
+                            <tr>
+                                <td><input type="checkbox" class="customer-checkbox" value="${customer.user_id}"></td>
+                                <td>${customer.user_id || 'N/A'}</td>
+                                <td>${customer.username || 'N/A'}</td>
+                                <td>${customer.email || 'N/A'}</td>
+<td>${customer.created_at ? new Date(customer.created_at).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : 'N/A'}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Action
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#">View</a>
+                                            <a class="dropdown-item" href="#">Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    $('#customerTableBody').html(rows);
+                    updateSelectedItemsCount();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching customer data:', error);
+                    $('#customerTableBody').html('<tr><td colspan="6" class="text-center text-danger">Error fetching data. Please try again later.</td></tr>');
+                }
+            });
+        }
+
+        function updateSelectedItemsCount() {
+            // Count the number of checked checkboxes
+            const selectedCount = $('.customer-checkbox:checked').length;
+            $('#selectedCount').text(`${selectedCount} items selected`);
+
+            // Show or hide the delete button based on the selection count
+            if (selectedCount > 0) {
+                $('#deleteSelected').show(); // Show delete button
+            } else {
+                $('#deleteSelected').hide(); // Hide delete button
+            }
+        }
+
+        function getSelectedCustomerIds() {
+            const selectedIds = [];
+            $('.customer-checkbox:checked').each(function() {
+                selectedIds.push($(this).val());
+            });
+            return selectedIds;
+        }
+
+
+        function exportToPDF(){
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const selectedData=[];
+            $('#customerTableBody tr').each(function(){
+                const user_id=$(this).find('td:eq(2)').text();
+                const username=$(this).find('td:eq(3)').text();
+                const email=$(this).find('td:eq(4)').text();
+
+                selectedData.push([user_id,username,email]);
+            })
+            const headers=['User ID',"Username","Email"];
+            const bodyData=selectedData.map(item=>[item[0],item[1],item[2]]);
+            let currentYPosition=20;
+            const rowPositions=[];
+            
+            doc.autoTable({
+                head:[headers],
+                body:bodyData,
+                startY:currentYPosition,
+                didDrawCell:(data)=>{
+                    const rowIndex=data.row.rowIndex;
+                    const item=selectedData[rowIndex];
+                    const linkYPosition=data.cursor.y;
+                    rowPositions[rowIndex]=linkYPosition;
+
+                    doc.link(data.cell.x+5,linkYPosition,40,5,{
+                        action:'goto',
+                        pageNumber:1,
+                        y:linkYPosition
+                    })
+                },
+                margin:{top:20,left:10,right:10},
+                pageBrake:"auto",
+                theme:'striped'
+            })
+            doc.save('table-data.pdf');
+        }
+    </script>
+</body>
+</html>

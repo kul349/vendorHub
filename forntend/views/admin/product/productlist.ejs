@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.1/dist/sweetalert2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.19/jspdf.plugin.autotable.min.js"></script>
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.1/dist/sweetalert2.all.min.js"></script>
+
+<link rel="stylesheet" href="/list.css">
+
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <span class="header-title">Product Listing</span>
+                <div class="search-container">
+                    <input class="form-control" type="text" id="searchProduct" placeholder="Search Product">
+                    <div class="export-buttons">
+                        <!-- Export dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-success dropdown-toggle" type="button" id="exportDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Export
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="exportDropdown">
+                               
+                                <a class="dropdown-item" href="#" id="exportPdf" onclick="exportToPDF()">  ExportPdf                                </a>
+
+
+                        
+                                <a class="dropdown-item" href="#" id="exportCsv">Export CSV</a>
+                                <a class="dropdown-item" href="#" id="exportXls">Export XLS</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Checkbox and delete buttons container -->
+                <div class="checkbox-container">
+                    <span class="selected-items-count" id="selectedCount">0 items selected</span>
+                    <button id="deleteSelected" class="btn btn-danger ml-3" style="display:none;">Delete Selected</button>
+                </div>
+
+                <!-- Table displaying customer details -->
+                <table id ="myTable" class="table table-bordered table-custom">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th>Image</th>
+                            <th>Sku_number</th>
+                            <th>Rating</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                    
+
+                        <!-- Customer data rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional: Add Bootstrap JS for interactivity -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.1/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Select all checkboxes functionality
+            $('#selectAll').on('change', function() {
+                const isChecked = $(this).prop('checked');
+                $('.product-checkbox').prop('checked', isChecked);
+                updateSelectedItemsCount();
+            });
+
+            // Listen for changes in individual checkboxes
+            $(document).on('change', '.product-checkbox', function() {
+                updateSelectedItemsCount();
+            });
+
+            // Delete selected product
+            $('#deleteSelected').on('click', function() {
+                const selectedIds = getSelectedCustomerIds();
+                if (selectedIds.length > 0) {
+
+            const swalWithBootstrapButtons=Swal.mixin({
+                customClass:{
+                    confirmButton:'btn btn-danger outline-rounded ',
+                    cancelButton:"btn btn-success outline-rounded"
+                },
+                buttonsStyling:false,
+                width:"400px",
+                padding:'20px',
+                heightAuto:true
+
+            });
+            swalWithBootstrapButtons.fire({
+                title:"are you sure? ",
+                text:"you want to delete the selected the product",
+                icon:'warning',
+                confirmButtonText:"yes, delete",
+                showCancelButton:true,
+
+                cancelButtonText:"No, cancel",
+                reverseButtons:true,
+
+
+            }).then((result)=>{
+                if(result.isConfirmed){
+                    swalWithBootstrapButtons.fire({
+                        title:"Deleted!",
+                        text:'you have deleted the all the selected products!',
+                        icon:"success",
+                        confirmButtonText:"ok, get it"
+                    });
+
+                }else if (                    
+                    result.dismiss===Swal.DismissReason.cancel
+                ){
+                    swalWithBootstrapButtons.fire({
+                        title:"cancelled!",
+                        text:"selected product was not delected",
+                        icon:"error",
+                           confirmButtonText:"ok, get it"
+
+                    })
+                }
+            })
+                    // alert('Delete product: ' + selectedIds.join(', '));
+                }
+            });
+            let debounceTimer;  // Declare debounceTimer to store the timeout ID
+
+$('#searchProduct').on('input', function() {
+    const searchQuery = $(this).val();
+
+    // Clear the previous timeout to prevent multiple rapid function calls
+    clearTimeout(debounceTimer);
+
+    // Set a new timeout to delay the fetchProduct call by 500ms
+    debounceTimer = setTimeout(function() {
+        fetchProduct(searchQuery);  // Call the fetchProduct function with the query
+    }, 500);  // Delay is set to 500 milliseconds (can be adjusted)
+});
+
+            // Initial fetch of customer data
+            fetchProduct();
+        });
+
+        function fetchProduct(query = '') {
+            $.ajax({
+                url: '/admin/fetch-product',  // URL to search for customer data
+                method: 'GET',
+                data: { query: query },  // Send search query in request
+                success: function(response) {
+                    const product = response.data; // Assuming response contains customer data
+                    if (!product || product.length === 0) {
+                // If no product are found, display a "No results found" message
+                $('#productTableBody').html('<tr><td colspan="6" class="text-center">No product found</td></tr>');
+                return;
+            }
+                    if (!product) {
+                        console.error('Data is missing in the response');
+                        return;
+                    }
+
+                    let rows = '';
+                    product.forEach(function(products) {
+                        
+                        rows += `
+                            <tr>
+                                <td><input type="checkbox" class="product-checkbox" value="${products.sku_number}"></td>
+                                <td>
+                                    <img src='/uploads/${Array.isArray(products.image)?products.image[0]:products.image}' style="width: 60px; height: 60px;"/>
+                                    </td>
+                                <td>${products.sku_number || 'N/A'}</td>
+                                <td>${products.rating|| 'N/A'}</td>
+                                 <td>${products.price|| 'N/A'}</td>
+
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Action
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#">View</a>
+                                            <a class="dropdown-item" href="#">Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    $('#productTableBody').html(rows);
+                    updateSelectedItemsCount();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching product data:', error);
+                    $('#productTableBody').html('<tr><td colspan="6" class="text-center text-danger">Error fetching data. Please try again later.</td></tr>');
+                }
+            });
+        }
+
+        function updateSelectedItemsCount() {
+            // Count the number of checked checkboxes
+            const selectedCount = $('.product-checkbox:checked').length;
+            $('#selectedCount').text(`${selectedCount} items selected`);
+
+            // Show or hide the delete button based on the selection count
+            if (selectedCount > 0) {
+                $('#deleteSelected').show(); // Show delete button
+            } else {
+                $('#deleteSelected').hide(); // Hide delete button
+            }
+        }
+
+        function getSelectedCustomerIds() {
+            const selectedIds = [];
+            $('.product-checkbox:checked').each(function() {
+                selectedIds.push($(this).val());
+            });
+            return selectedIds;
+        }
+
+        function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Collect selected data from the table
+    const selectedData = [];
+    $('#productTableBody tr').each(function () {
+        const sku_number = $(this).find('td:eq(2)').text();
+        const rating = $(this).find('td:eq(3)').text();
+        const price = $(this).find('td:eq(4)').text();
+
+        selectedData.push([sku_number, rating, price]);
+    });
+
+    const headers = ['Sku_number', 'Rating', 'Price'];
+    const bodyData = selectedData.map(item => [item[0], item[1], item[2]]);
+
+    let currentYPosition = 20; // Start position for rows
+    const rowPositions = [];
+
+    // Add each row to the PDF, but also store the Y positions
+    doc.autoTable({
+        head: [headers],
+        body: bodyData,
+        startY: currentYPosition,
+        didDrawCell: (data) => {
+            const rowIndex = data.row.index;
+            const item = selectedData[rowIndex];
+
+            const linkYPosition = data.cursor.y;
+
+            // Store the Y position for each row
+            rowPositions[rowIndex] = linkYPosition;
+
+            
+
+            // Create the clickable link that will point to this row's Y position
+            doc.link(data.cell.x + 5, linkYPosition, 80, 10, { // link coordinates
+                action: 'goto', 
+                pageNumber: 1, // on the first page
+                y: linkYPosition // destination Y position
+            });
+        },
+        margin: { top: 20, left: 10, right: 10 },
+        pageBreak: 'auto',
+        theme: 'striped',
+    });
+
+    // Save the generated PDF
+    doc.save('table-data.pdf');
+}
+
+
+    </script>
+</body>
+</html>

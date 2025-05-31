@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Panel</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f6f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: #f1f3f6;
+            border-bottom: 1px solid #ddd;
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .table-custom {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table-custom th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .table-custom td {
+            background-color: #fff;
+        }
+
+        .table-custom a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .table-custom a:hover {
+            text-decoration: underline;
+        }
+
+        .dropdown-toggle {
+            border-radius: 5px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            background-color: green;
+        }
+
+        .dropdown-menu {
+            border-radius: 0 0 5px 5px;
+            min-width: 150px;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .search-container input {
+            max-width: 250px;
+        }
+
+        .action-btn {
+            margin-left: 10px;
+            border: 1px solid #ddd;
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .action-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .checkbox-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 10px;
+        }
+
+        .checkbox-container span {
+            margin-left: 10px;
+        }
+
+        .export-buttons {
+            margin-left: 20px;
+        }
+
+        .selected-items-count {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <span class="header-title">Vendor Listing</span>
+                <div class="search-container">
+                    <input class="form-control" type="text" id="searchVendor" placeholder="Search Vendor">
+                    <div class="export-buttons">
+                        <div class="dropdown">
+                            <button class="btn btn-success dropdown-toggle" type="button" id="exportDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Export
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="exportDropdown">
+                                <a class="dropdown-item" href="#" id="exportPdf">Export PDF</a>
+                                <a class="dropdown-item" href="#" id="exportCsv">Export CSV</a>
+                                <a class="dropdown-item" href="#" id="exportXls">Export XLS</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="checkbox-container">
+                    <span class="selected-items-count" id="selectedCount">0 items selected</span>
+                    <button id="deleteSelected" class="btn btn-danger ml-3" style="display:none;">Delete Selected</button>
+                </div>
+
+                <table class="table table-bordered table-custom">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th>Vendor ID</th>
+                            <th>Email</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vendorTableBody">
+                        <!-- Vendor data rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for viewing Vendor application -->
+    <div class="modal fade" id="viewVendorModal" tabindex="-1" role="dialog" aria-labelledby="viewVendorModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewVendorModalLabel">Vendor Application</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="vendorDetails">
+                        <p><strong>Name:</strong> <span id="vendorName"></span></p>
+                        <p><strong>Email:</strong> <span id="vendorEmail"></span></p>
+                        <p><strong>Phone:</strong> <span id="vendorPhone"></span></p>
+                        <p><strong>Company:</strong> <span id="vendorCompany"></span></p>
+                      <p><strong>Business_Adress:</strong> <span id="business_address"></span></p>
+                        <p><strong>Website:</strong> <span id="website"></span></p>
+                        <p><strong>product_type:</strong> <span id="product_type"></span></p>
+                        <p><strong>tax_id:</strong> <span id="tax_id"></span></p>
+
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="approveVendorBtn">Approve</button>
+                    <button type="button" class="btn btn-danger" id="rejectVendorBtn">Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let debounceTimer;
+
+            // Search vendors with debounce
+            $('#searchVendor').on('input', function() {
+                const searchQuery = $(this).val();
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function() {
+                    fetchVendor(searchQuery);
+                }, 500);
+            });
+
+            // Fetch vendor data with optional search query
+            function fetchVendor(query = '') {
+                $.ajax({
+                    url: '/admin/vendors/search', 
+                    method: 'GET',
+                    data: { query: query },
+                    success: function(response) {
+                        const vendors = response.data;
+                        let rows = '';
+                        vendors.forEach(function(vendor) {
+                            rows += `
+                                <tr>
+                                    <td><input type="checkbox" class="vendor-checkbox" value="${vendor.vendor_id}"></td>
+                                    <td>${vendor.vendor_id}</td>
+                                    <td>${vendor.email}</td>
+                                    <td>${vendor.created_at}</td>
+                                    <td>
+                                        <button class="btn btn-info viewVendorBtn" data-vendor-id="${vendor.vendor_id}">View</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        $('#vendorTableBody').html(rows);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching vendor data:', error);
+                    }
+                });
+            }
+
+            // Initial fetch of vendor data
+            fetchVendor();
+
+            // Fetch vendor details for modal view
+            $(document).on('click', '.viewVendorBtn', function() {
+                const vendorId = $(this).data('vendor-id');
+
+                $.ajax({
+                    url: `/admin/vendors-details/${vendorId}`,
+                    method: 'GET',
+                    success: function(response) {
+                        const vendor = response.data;
+                        $('#vendorName').text(vendor.first_name);
+                        $('#vendorEmail').text(vendor.email);
+                        $('#vendorPhone').text(vendor.phone);
+                        $('#vendorCompany').text(vendor.business_name);
+                        $('#business_address').text(vendor.business_address);
+                        $('#website').text(vendor.website);
+                        $('#product_type').text(vendor.product_type);
+                        $('#tax_id').text(vendor.tax_id );
+
+
+
+                        // Store vendor ID for approve/reject actions
+                        $('#approveVendorBtn').data('vendor-id', vendorId);
+                        $('#rejectVendorBtn').data('vendor-id', vendorId);
+
+                        // Show the modal
+                        $('#viewVendorModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching vendor details:', error);
+                    }
+                });
+            });
+
+            // Approve Vendor Action
+            $('#approveVendorBtn').on('click', function() {
+                const vendorId = $(this).data('vendor-id');
+
+                $.ajax({
+                    url: `/admin/vendors/approve/${vendorId}`,
+                    method: 'POST',
+                    success: function(response) {
+                        alert(response.message);
+                        $('#viewVendorModal').modal('hide');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error approving vendor:', error);
+                    }
+                });
+            });
+
+            // Reject Vendor Action
+            $('#rejectVendorBtn').on('click', function() {
+                const vendorId = $(this).data('vendor-id');
+
+                $.ajax({
+                    url: `/admin/vendors/reject/${vendorId}`,
+                    method: 'POST',
+                    success: function(response) {
+                        alert(response.message);
+                        $('#viewVendorModal').modal('hide');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error rejecting vendor:', error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

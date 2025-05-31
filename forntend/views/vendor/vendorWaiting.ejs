@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Approval - VendorHub</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Background and body styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2196F3, #21CBF3);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .waiting-container {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            color: #ddd;
+        }
+
+        .info-text {
+            font-size: 1.1em;
+            color: #bbb;
+            margin-bottom: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid transparent;
+            border-top: 5px solid #fff;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            font-size: 0.9em;
+            margin-top: 30px;
+            color: #ccc;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Responsive styling */
+        @media (max-width: 600px) {
+            .waiting-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .message {
+                font-size: 1em;
+            }
+
+            .info-text {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="waiting-container">
+        <h1>Welcome to VendorHub!</h1>
+        <div class="message">
+            <p>Your vendor account is under review.</p>
+            <p>Please be patient as our admin team verifies your details.</p>
+        </div>
+
+        <div class="spinner"></div>
+
+        <div class="info-text">
+            <p>VendorHub is a platform designed to connect vendors with businesses and customers. Once approved, you will gain access to:</p>
+            <ul>
+                <li>Manage your products and services</li>
+                <li>Track your orders and customers</li>
+                <li>Benefit from exclusive marketing tools</li>
+                <li>And much more!</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>If you have any questions, feel free to <a href="/contact">contact support</a>.</p>
+        </div>
+    </div>
+</body>
+</html>
